@@ -1,9 +1,0 @@
-
-- hosts: cible
-  become: yes
-  roles:
-    - common
-    - bdd
-    - gitlab
-    - docker
-
