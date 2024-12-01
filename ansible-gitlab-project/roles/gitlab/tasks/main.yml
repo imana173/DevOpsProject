@@ -1,0 +1,33 @@
+- name: Update APT packages
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Install dependencies
+  apt:
+    name: "{{ gitlab_dependencies }}"
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Add GitLab package repository
+  shell: curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | bash
+  become: yes
+
+- name: Install GitLab CE
+  apt:
+    name: "{{ gitlab_package_name }}"
+    state: present
+  become: yes
+
+- name: Template GitLab configuration
+  template:
+    src: gitlab.rb.j2
+    dest: "{{ gitlab_config_file }}"
+  become: yes
+  notify: Reconfigure GitLab
+
+- name: Reconfigure GitLab
+  command: gitlab-ctl reconfigure
+  become: yes
+  notify: Restart GitLab
